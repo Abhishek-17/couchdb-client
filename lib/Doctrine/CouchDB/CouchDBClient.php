@@ -423,6 +423,25 @@ class CouchDBClient
     }
 
     /**
+     * Get a design document.
+     *
+     * @param string $designDocName
+     * @return HTTP\Response
+     * @throws HTTPException
+     */
+    public function getDesignDocument($designDocName)
+    {
+        $response = $this->httpClient->request('GET', '/' . $this->databaseName . 
+            '/_design/' . $designDocName);
+
+        if ($response->status != 200) {
+            throw HTTPException::fromResponse('/' . urlencode($name), $response);
+        }
+
+        return $response->body;
+    }
+
+    /**
      * GET /db/_compact
      *
      * Return array of data about compaction status.
