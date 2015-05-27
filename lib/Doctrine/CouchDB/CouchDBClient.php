@@ -442,6 +442,25 @@ class CouchDBClient
     }
 
     /**
+     * Get replication log.
+     *
+     * @param string $designDocName
+     * @return HTTP\Response
+     * @throws HTTPException
+     */
+    public function getReplicationLog($repId)
+    {
+        $response = $this->httpClient->request('GET', '/' . $this->databaseName . 
+            '/_local/' . $repId);
+
+        if ($response->status != 200) {
+            throw HTTPException::fromResponse('/' . urlencode($name), $response);
+        }
+
+        return $response->body;
+    }
+
+    /**
      * GET /db/_compact
      *
      * Return array of data about compaction status.
