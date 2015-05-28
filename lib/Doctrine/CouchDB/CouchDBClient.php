@@ -580,4 +580,23 @@ class CouchDBClient
         }
         return $response->body;
     }
+
+    /**
+     * Get revision difference.
+     *
+     * @param  array $params
+     * @return array
+     * @throws HTTPException
+     */
+    public function getRevisionDifference(array $params = array())
+    {
+        $path = '/' . $this->databaseName . '/_revs_diff';
+        $response = $this->httpClient->request('POST', $path, json_encode($params));
+
+        if ($response->status != 200) {
+            throw HTTPException::fromResponse($path, $response);
+        }
+
+        return $response->body;
+    }
 }
