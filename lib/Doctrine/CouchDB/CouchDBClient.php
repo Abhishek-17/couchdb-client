@@ -286,11 +286,14 @@ class CouchDBClient
      * @return array
      * @throws HTTPException
      */
-    public function getChanges(array $params = array())
+    public function getChanges(array $params = array(), $raw = false)
     {
         $path = '/' . $this->databaseName . '/_changes';
 
-        if (count($params) > 0) {
+        $method = (isset($params['doc_ids']) ? "GET" : "POST");
+        $response = '';
+
+        if ($method == "GET") {
 
             foreach ($params as $key => $value) {
                 if (isset($params[$key]) === true && is_bool($value) === true) {
@@ -298,11 +301,17 @@ class CouchDBClient
                 }
             }
 
-            $query = http_build_query($params);
+            $query = '';
+            if (count($params) > 0) {
+                $query = http_build_query($params);
+            }
             $path = $path.'?'.$query;
+            $response = $this->httpClient->request('GET', $path, null, $raw);
+        } else {
+             $response = $this->httpClient->request('POST', $path, json_encode($params), $raw);
         }
 
-        $response = $this->httpClient->request('GET', $path);
+        
 
         if ($response->status != 200) {
             throw HTTPException::fromResponse($path, $response);
