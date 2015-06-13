@@ -301,11 +301,12 @@ class CouchDBClient
                 }
             }
 
-            $query = '';
+          
             if (count($params) > 0) {
                 $query = http_build_query($params);
+                $path = $path.'?'.$query;
             }
-            $path = $path.'?'.$query;
+           
             $response = $this->httpClient->request('GET', $path, null, $raw);
         } else {
              $response = $this->httpClient->request('POST', $path, json_encode($params), $raw);
