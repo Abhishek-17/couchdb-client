@@ -126,7 +126,7 @@ class StreamClient extends AbstractHTTPClient
         return new Response( $headers['status'], $headers, $body, $raw );
     }
 
-    function getFirstLine(& $str)
+    public function getFirstLine(& $str)
     {
         $i = 0;
         $firstLine = '';
@@ -135,7 +135,8 @@ class StreamClient extends AbstractHTTPClient
         }
         return $firstLine;
     }
-    function parseMultipartData(& $rawData)
+    
+    public function parseMultipartData(& $rawData)
     {
         $mainBoundary = getFirstLine($rawData);
         $arr = explode($mainBoundary, $rawData);
