@@ -628,11 +628,11 @@ class CouchDBClient
 
     }
 
-    public function myRequest($path, $params, $method = 'GET')
+    public function myRequest($path, $params, $method = 'GET', $raw = false)
     {
         $response = '';
         if ($method=='POST') {
-            $response = $this->httpClient->request('POST', '/' .$path,json_encode($params));
+            $response = $this->httpClient->request('POST', '/' .$path,json_encode($params), $raw);
         } else {
             foreach ($params as $key => $value) {
                 if (isset($params[$key]) === true && is_bool($value) === true) {
@@ -645,7 +645,7 @@ class CouchDBClient
                 $query = http_build_query($params);
                 $path = $path.'?'.$query;
             }
-            $response = $this->httpClient->request('GET', '/' .$path);
+            $response = $this->httpClient->request('GET', '/' .$path, null, $raw);
         }
         
 
