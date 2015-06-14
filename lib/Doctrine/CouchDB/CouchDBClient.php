@@ -609,4 +609,49 @@ class CouchDBClient
 
         return $response->body;
     }
+
+    public function putMultipartData($docId, $data, array $headers)
+    {
+        if (!isset($headers['Content-Type'])) {
+            throw new InvalidArgumentException('Content-Type not specified in the headers');
+        }
+
+        $path = '/' . $this->databaseName . '/' . urlencode($docId) . "?new_edits=false";
+        $response = $this->httpClient->request('PUT', $path, $data, false, $headers);
+
+        if ($response->status != 201) {
+            throw HTTPException::fromResponse($path, $response);
+        }
+
+        return $response->body;
+
+    }
+
+    public function myRequest($path, $params, $method = 'GET')
+    {
+        $response = '';
+        if ($method=='POST') {
+            $response = $this->httpClient->request('POST', '/' .$path,json_encode($params));
+        } else {
+            foreach ($params as $key => $value) {
+                if (isset($params[$key]) === true && is_bool($value) === true) {
+                    $params[$key] = ($value) ? 'true': 'false';
+                }
+            }
+
+          
+            if (count($params) > 0) {
+                $query = http_build_query($params);
+                $path = $path.'?'.$query;
+            }
+            $response = $this->httpClient->request('GET', '/' .$path);
+        }
+        
+
+        if ($response->status != 200) {
+            throw HTTPException::fromResponse('/' . $path, $response);
+        }
+
+        return $response->body;
+    }
 }

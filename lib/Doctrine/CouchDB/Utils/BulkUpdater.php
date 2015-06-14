@@ -42,6 +42,7 @@ class BulkUpdater
     {
         $this->httpClient = $httpClient;
         $this->databaseName = $databaseName;
+        $this->data["new_edits"] = 'false'; 
     }
 
     public function setAllOrNothing($allOrNothing)
@@ -54,6 +55,13 @@ class BulkUpdater
         $this->data['docs'][] = $data;
     }
 
+    public function updateDocuments(& $docs)
+    {
+        foreach ($docs as $doc) {
+            $this->data['docs'][] = $doc;
+        }
+    }
+
     public function deleteDocument($id, $rev)
     {
         $this->data['docs'][] = array('_id' => $id, '_rev' => $rev, '_deleted' => true);
@@ -61,7 +69,7 @@ class BulkUpdater
 
     public function execute()
     {
-        return $this->httpClient->request('POST', $this->getPath(), json_encode($this->data));
+        return $this->httpClient->request('POST', $this->getPath(), json_encode($this->data), false, array('X-Couch-Full-Commit' => false));
     }
 
     public function getPath()

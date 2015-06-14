@@ -47,7 +47,7 @@ class StreamClient extends AbstractHTTPClient
      * @return Response
      * @throws HTTPException
      */
-    public function request( $method, $path, $data = null, $raw = false )
+    public function request( $method, $path, $data = null, $raw = false, $headers = array() )
     {
         $basicAuth = '';
         if ( $this->options['username'] ) {
@@ -124,6 +124,77 @@ class StreamClient extends AbstractHTTPClient
             return new ErrorResponse( $headers['status'], $headers, $body );
         }
         return new Response( $headers['status'], $headers, $body, $raw );
+    }
+
+    function getFirstLine(& $str)
+    {
+        $i = 0;
+        $firstLine = '';
+        while($str[$i] != "\r" && $str[$i] != "\n"){
+            $firstLine.=$str[$i++];
+        }
+        return $firstLine;
+    }
+    function parseMultipartData(& $rawData)
+    {
+        $mainBoundary = getFirstLine($rawData);
+        $arr = explode($mainBoundary, $rawData);
+        $docStack = array();
+        $multipartDocStack = array();
+
+        foreach ($arr as $strBlock) {
+            if (!strlen($strBlock) || $strBlock === '--') {
+               continue;
+            }
+            $strBlock = ltrim($strBlock);
+            $firstLine = getFirstLine($strBlock);
+            if (strpos($firstLine, "Content-Type") !== false) {
+
+                list($header, $value) = explode(":", $firstLine);
+                $header = trim($header);
+                $value = trim($value);
+                $boundary = '';
+
+                if (strpos($value, ";") !==false) {
+
+                    list($type,$info) = explode(";", $value,2);
+                    $info = trim($info);
+
+                    if (strpos($info, "boundary") !==false) {
+                        $boundary = $info;
+
+                    } elseif (strpos($info, "error") !== false) {
+                        continue;//missing revs at source
+
+                    } else {
+                        //echo $strBlock;
+                        throw new \Exception("Unknown parameter with Content-Type.");
+                    }
+
+                }
+
+                if (strpos($value, "multipart/related") !==false) {
+
+                    if ($boundary == '') {
+                        throw new \Exception("Boundary not set for multipart/related data.");
+                    }
+                    $boundary = explode("=",$boundary,2)[1];
+                    $multipartDocStack[$boundary] = trim(explode($firstLine, $strBlock,2)[1]);
+
+                } elseif ($value == 'application/json') {
+                    $jsonDoc = trim(preg_split( '/\n|\r\n?/', $strBlock,3)[2]);
+                    array_push($docStack, $jsonDoc);
+
+                } else {
+                    throw new \UnexpectedValueException("This value is not supported.");
+                }
+
+            } else {
+                throw new \Exception('The first line is not the Content-Type.');
+            }
+        }
+        return array($docStack, $multipartDocStack);
+
     }
 }
 

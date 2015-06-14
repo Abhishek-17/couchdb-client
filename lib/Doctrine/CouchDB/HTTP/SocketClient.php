@@ -98,7 +98,7 @@ class SocketClient extends AbstractHTTPClient
      * @param string $data
      * @return string
      */
-    protected function buildRequest( $method, $path, $data )
+    protected function buildRequest( $method, $path, $data, $headers )
     {
         // Create basic request headers
         $request = "$method $path HTTP/1.1\r\nHost: {$this->options['host']}\r\n";
@@ -115,7 +115,16 @@ class SocketClient extends AbstractHTTPClient
         // initilization costs low, especially when the database server is not
         // available in the locale net.
         $request .= "Connection: " . ( $this->options['keep-alive'] ? 'Keep-Alive' : 'Close' ) . "\r\n";
-        $request .= "Content-type: application/json\r\n";
+
+        if (!isset($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
+        foreach ($headers as $key => $value) {
+            if (is_bool($value) === true) {
+                $value = ($value) ? 'true': 'false';
+            }
+            $request .=$key.": ".$value."\r\n";
+        }
 
         // Also add headers and request body if data should be sent to the
         // server. Otherwise just add the closing mark for the header section
@@ -147,13 +156,13 @@ class SocketClient extends AbstractHTTPClient
      * @param bool $raw
      * @return Response
      */
-    public function request( $method, $path, $data = null, $raw = false )
+    public function request( $method, $path, $data = null, $raw = false, $headers = array() )
     {
         // Try establishing the connection to the server
         $this->checkConnection();
 
         // Send the build request to the server
-        if ( fwrite( $this->connection, $request = $this->buildRequest( $method, $path, $data ) ) === false )
+        if ( fwrite( $this->connection, $request = $this->buildRequest( $method, $path, $data, $headers ) ) === false )
         {
             // Reestablish which seems to have been aborted
             //
