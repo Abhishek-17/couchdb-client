@@ -138,7 +138,7 @@ class StreamClient extends AbstractHTTPClient
     
     public function parseMultipartData(& $rawData)
     {
-        $mainBoundary = getFirstLine($rawData);
+        $mainBoundary = $this->getFirstLine($rawData);
         $arr = explode($mainBoundary, $rawData);
         $docStack = array();
         $multipartDocStack = array();
@@ -148,7 +148,7 @@ class StreamClient extends AbstractHTTPClient
                continue;
             }
             $strBlock = ltrim($strBlock);
-            $firstLine = getFirstLine($strBlock);
+            $firstLine = $this->getFirstLine($strBlock);
             if (strpos($firstLine, "Content-Type") !== false) {
 
                 list($header, $value) = explode(":", $firstLine);

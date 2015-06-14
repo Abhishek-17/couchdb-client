@@ -464,7 +464,8 @@ class CouchDBClient
             '/_local/' . $repId);
 
         if ($response->status != 200) {
-            throw HTTPException::fromResponse('/' . urlencode($name), $response);
+            throw HTTPException::fromResponse('/' . $this->databaseName . 
+            '/_local/' , $response);
         }
 
         return $response->body;

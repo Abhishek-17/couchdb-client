@@ -132,7 +132,7 @@ class SocketClient extends AbstractHTTPClient
         if ( $data !== null )
         {
             $request .= "Content-Length: " . strlen( $data ) . "\r\n\r\n";
-            $request .= "$data";
+            $request .= $data;
         }
         else
         {
