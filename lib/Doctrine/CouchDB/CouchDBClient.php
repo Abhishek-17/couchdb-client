@@ -61,7 +61,9 @@ class CouchDBClient
 
     static private $clients = array(
         'socket' => 'Doctrine\CouchDB\HTTP\SocketClient',
+        'socket2' => 'Doctrine\CouchDB\HTTP\SocketClient2',
         'stream' => 'Doctrine\CouchDB\HTTP\StreamClient',
+        'stream2' => 'Doctrine\CouchDB\HTTP\StreamClient2',
     );
 
     /**
@@ -627,7 +629,7 @@ class CouchDBClient
         return $response->body;
 
     }
-    public function fetchChangedDocuments($docId, $params)
+    public function fetchChangedDocuments($docId, $params, $target)
     {
         $path = '/' . $this->getDatabase() . '/' . $docId;
 
@@ -641,10 +643,10 @@ class CouchDBClient
             $path .= '?' . $query;
         }
 
-        $response = $this->httpClient->request('GET', '/' .$path);
+        $response = $this->httpClient->request('GET',$path,null,false,$target,$docId);
 
         if ($response->status != 200) {
-            throw HTTPException::fromResponse($path, $response);
+            throw HTTPException::fromResponse('/' . $path, $response);
         }
 
         return $response->body;
@@ -654,7 +656,7 @@ class CouchDBClient
     {
         $response = '';
         if ($method=='POST') {
-            $response = $this->httpClient->request('POST', '/' . $path,json_encode($params), $raw);
+            $response = $this->httpClient->request('POST', '/' .$path,json_encode($params), $raw);
         } else {
             foreach ($params as $key => $value) {
                 if (isset($params[$key]) === true && is_bool($value) === true) {
@@ -667,7 +669,7 @@ class CouchDBClient
                 $query = http_build_query($params);
                 $path = $path.'?'.$query;
             }
-            $response = $this->httpClient->request('GET', '/' . $path, null, $raw);
+            $response = $this->httpClient->request('GET', '/' .$path, null, $raw);
         }
         
 
@@ -678,3 +680,4 @@ class CouchDBClient
         return $response->body;
     }
 }
+
