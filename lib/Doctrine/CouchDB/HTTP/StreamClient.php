@@ -47,7 +47,7 @@ class StreamClient extends AbstractHTTPClient
      * @return Response
      * @throws HTTPException
      */
-    public function request( $method, $path, $data = null, $raw = false, $headers = array() )
+    public function request( $method, $path, $data = null, $raw = false)
     {
         $basicAuth = '';
         if ( $this->options['username'] ) {

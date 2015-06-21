@@ -644,7 +644,7 @@ class CouchDBClient
         $response = $this->httpClient->request('GET', '/' .$path);
 
         if ($response->status != 200) {
-            throw HTTPException::fromResponse($path, $response);
+            throw HTTPException::fromResponse('/' . $path, $response);
         }
 
         return $response->body;
