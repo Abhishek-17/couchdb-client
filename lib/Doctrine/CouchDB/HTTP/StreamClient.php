@@ -47,11 +47,18 @@ class StreamClient extends AbstractHTTPClient
      * @return Response
      * @throws HTTPException
      */
-    public function request( $method, $path, $data = null, $raw = false, $headers = array() )
+    public function request( $method, $path, $data = null, $raw = false, $headers = null )
     {
         $basicAuth = '';
         if ( $this->options['username'] ) {
             $basicAuth .= "{$this->options['username']}:{$this->options['password']}@";
+        }
+
+        $stringHeader = '';
+        if ($headers != null) {
+            foreach ($headers as $key => $val) {
+                $stringHeader .= $key . ": " . $val . "\r\n";
+            }
         }
 
         // TODO SSL support?
@@ -68,7 +75,7 @@ class StreamClient extends AbstractHTTPClient
                         'max_redirects' => 0,
                         'user_agent'    => 'Doctrine CouchDB ODM $Revision$',
                         'timeout'       => $this->options['timeout'],
-                        'header'        => 'Content-type: application/json',
+                        'header'        => $stringHeader,
                     ),
                 )
             )
