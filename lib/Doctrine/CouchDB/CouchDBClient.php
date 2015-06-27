@@ -19,8 +19,10 @@
 
 namespace Doctrine\CouchDB;
 
+use Doctrine\CouchDB\HTTP\AbstractHTTPClient;
 use Doctrine\CouchDB\HTTP\Client;
 use Doctrine\CouchDB\HTTP\HTTPException;
+use Doctrine\CouchDB\HTTP\MultipartClient;
 use Doctrine\CouchDB\Utils\BulkUpdater;
 use Doctrine\CouchDB\View\DesignDocument;
 
@@ -629,7 +631,7 @@ class CouchDBClient
         return $response->body;
 
     }
-    public function fetchChangedDocuments($docId, $params, $target)
+    public function fetchChangedDocuments($docId, $params, CouchDBClient $target)
     {
         $path = '/' . $this->getDatabase() . '/' . $docId;
 
@@ -643,7 +645,18 @@ class CouchDBClient
             $path .= '?' . $query;
         }
 
-        $response = $this->httpClient->request('GET',$path,null,false,$target,$docId);
+        $targetPath = '/' . $target->getDatabase() . '/' . $docId . '?new_edits=false';
+        $multipartClient = new MultipartClient($this->getHttpClient(), $target->getHttpClient());
+
+        $response = $multipartClient->request(
+            'GET',
+            $path,
+            null,
+            false,
+            array('Accept' => 'multipart/mixed'),
+            $targetPath
+        );
+
 
         if ($response->status != 200) {
             throw HTTPException::fromResponse('/' . $path, $response);
