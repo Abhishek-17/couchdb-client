@@ -153,7 +153,7 @@ class CouchDBClient
     public function findDocument($id)
     {
         $documentPath = '/' . $this->databaseName . '/' . urlencode($id);
-        return $this->httpClient->request( 'GET', $documentPath );
+        return $this->httpClient->request('GET', $documentPath);
     }
 
     /**
@@ -175,7 +175,7 @@ class CouchDBClient
         }
 
         return $this->httpClient->request('POST', $allDocsPath, json_encode(
-            array('keys' => array_values($ids)))
+                array('keys' => array_values($ids)))
         );
     }
 
@@ -193,7 +193,7 @@ class CouchDBClient
             $allDocsPath .= '&limit=' . (int)$limit;
         }
         if ($startKey) {
-            $allDocsPath .= '&startkey="' . (string)$startKey.'"';
+            $allDocsPath .= '&startkey="' . (string)$startKey . '"';
         }
         return $this->httpClient->request('GET', $allDocsPath);
     }
@@ -301,23 +301,18 @@ class CouchDBClient
 
             foreach ($params as $key => $value) {
                 if (isset($params[$key]) === true && is_bool($value) === true) {
-                    $params[$key] = ($value) ? 'true': 'false';
+                    $params[$key] = ($value) ? 'true' : 'false';
                 }
             }
-
-          
             if (count($params) > 0) {
                 $query = http_build_query($params);
-                $path = $path.'?'.$query;
+                $path = $path . '?' . $query;
             }
-           
             $response = $this->httpClient->request('GET', $path, null, $raw);
+
         } else {
-             $response = $this->httpClient->request('POST', $path, json_encode($params), $raw);
+            $response = $this->httpClient->request('POST', $path, json_encode($params), $raw);
         }
-
-        
-
         if ($response->status != 200) {
             throw HTTPException::fromResponse($path, $response);
         }
@@ -418,11 +413,11 @@ class CouchDBClient
      */
     public function createDesignDocument($designDocName, DesignDocument $designDoc)
     {
-        $data        = $designDoc->getData();
+        $data = $designDoc->getData();
         $data['_id'] = '_design/' . $designDocName;
 
         $documentPath = '/' . $this->databaseName . '/' . $data['_id'];
-        $response     = $this->httpClient->request( 'GET', $documentPath );
+        $response = $this->httpClient->request('GET', $documentPath);
 
         if ($response->status == 200) {
             $docData = $response->body;
@@ -436,44 +431,6 @@ class CouchDBClient
         );
     }
 
-    /**
-     * Get a design document.
-     *
-     * @param string $designDocName
-     * @return HTTP\Response
-     * @throws HTTPException
-     */
-    public function getDesignDocument($designDocName)
-    {
-        $response = $this->httpClient->request('GET', '/' . $this->databaseName . 
-            '/_design/' . $designDocName);
-
-        if ($response->status != 200) {
-            throw HTTPException::fromResponse('/' . urlencode($name), $response);
-        }
-
-        return $response->body;
-    }
-
-    /**
-     * Get replication log.
-     *
-     * @param string $designDocName
-     * @return HTTP\Response
-     * @throws HTTPException
-     */
-    public function getReplicationLog($repId)
-    {
-        $response = $this->httpClient->request('GET', '/' . $this->databaseName . 
-            '/_local/' . $repId);
-
-        if ($response->status != 200) {
-            throw HTTPException::fromResponse('/' . $this->databaseName . 
-            '/_local/' , $response);
-        }
-
-        return $response->body;
-    }
 
     /**
      * GET /db/_compact
@@ -599,14 +556,14 @@ class CouchDBClient
     /**
      * Get revision difference.
      *
-     * @param  array $params
+     * @param  array $data
      * @return array
      * @throws HTTPException
      */
-    public function getRevisionDifference(array $params = array())
+    public function getRevisionDifference($data)
     {
         $path = '/' . $this->databaseName . '/_revs_diff';
-        $response = $this->httpClient->request('POST', $path, json_encode($params));
+        $response = $this->httpClient->request('POST', $path, json_encode($data));
 
         if ($response->status != 200) {
             throw HTTPException::fromResponse($path, $response);
@@ -631,13 +588,14 @@ class CouchDBClient
         return $response->body;
 
     }
+
     public function fetchChangedDocuments($docId, $params, CouchDBClient $target)
     {
         $path = '/' . $this->getDatabase() . '/' . $docId;
 
         foreach ($params as $key => $value) {
             if (isset($params[$key]) === true && is_bool($value) === true) {
-                $params[$key] = ($value) ? 'true': 'false';
+                $params[$key] = ($value) ? 'true' : 'false';
             }
         }
         if (count($params) > 0) {
@@ -668,23 +626,23 @@ class CouchDBClient
     public function myRequest($path, $params, $method = 'GET', $raw = false)
     {
         $response = '';
-        if ($method=='POST') {
-            $response = $this->httpClient->request('POST', '/' .$path,json_encode($params), $raw);
+        if ($method == 'POST') {
+            $response = $this->httpClient->request('POST', '/' . $path, json_encode($params), $raw);
         } else {
             foreach ($params as $key => $value) {
                 if (isset($params[$key]) === true && is_bool($value) === true) {
-                    $params[$key] = ($value) ? 'true': 'false';
+                    $params[$key] = ($value) ? 'true' : 'false';
                 }
             }
 
-          
+
             if (count($params) > 0) {
                 $query = http_build_query($params);
-                $path = $path.'?'.$query;
+                $path = $path . '?' . $query;
             }
-            $response = $this->httpClient->request('GET', '/' .$path, null, $raw);
+            $response = $this->httpClient->request('GET', '/' . $path, null, $raw);
         }
-        
+
 
         if ($response->status != 200) {
             throw HTTPException::fromResponse('/' . $path, $response);
