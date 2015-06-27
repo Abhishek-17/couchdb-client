@@ -300,24 +300,19 @@ class CouchDBClient
                     $params[$key] = ($value) ? 'true': 'false';
                 }
             }
-
-          
             if (count($params) > 0) {
                 $query = http_build_query($params);
                 $path = $path.'?'.$query;
             }
-           
             $response = $this->httpClient->request('GET', $path, null, $raw);
+
         } else {
              $response = $this->httpClient->request('POST', $path, json_encode($params), $raw);
         }
-
-        
-
         if ($response->status != 200) {
             throw HTTPException::fromResponse($path, $response);
         }
-
+        
         return $response->body;
     }
 
