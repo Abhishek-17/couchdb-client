@@ -616,7 +616,7 @@ class CouchDBClient
         );
 
 
-        if ($response->status != 200) {
+        if ($response->status != 201) {
             throw HTTPException::fromResponse('/' . $path, $response);
         }
 
