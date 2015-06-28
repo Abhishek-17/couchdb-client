@@ -63,9 +63,7 @@ class CouchDBClient
 
     static private $clients = array(
         'socket' => 'Doctrine\CouchDB\HTTP\SocketClient',
-        'socket2' => 'Doctrine\CouchDB\HTTP\SocketClient2',
         'stream' => 'Doctrine\CouchDB\HTTP\StreamClient',
-        'stream2' => 'Doctrine\CouchDB\HTTP\StreamClient2',
     );
 
     /**
@@ -649,6 +647,52 @@ class CouchDBClient
         }
 
         return $response->body;
+    }
+
+    public function getChangesAsStream(array $params = array(), $raw = false)
+    {
+        $path = '/' . $this->databaseName . '/_changes';
+        $multipartClient = new MultipartClient($this->getHttpClient());
+
+        $method = ((isset($params['doc_ids']) && $params['docs_ids']) == null ? "GET" : "POST");
+        $stream = null;
+
+        if ($method == "GET") {
+
+            foreach ($params as $key => $value) {
+                if (isset($params[$key]) === true && is_bool($value) === true) {
+                    $params[$key] = ($value) ? 'true': 'false';
+                }
+            }
+
+            if (count($params) > 0) {
+                $query = http_build_query($params);
+                $path = $path.'?'.$query;
+            }
+
+            $stream = $multipartClient->request('GET', $path, null, $raw);
+        } else {
+            $stream = $multipartClient->request('POST', $path, json_encode($params), $raw);
+        }
+
+        $headers = $multipartClient->getStreamHeaders($stream);
+
+        if (empty($headers['status'])) {
+            throw HTTPException::readFailure(
+                $multipartClient->getSourceOptions()['ip'],
+                $$multipartClient->getSourceOptions()['port'],
+                'Received an empty response or not status code',
+                0
+            );
+        } elseif ($headers['status'] != 200) {
+            $body = '';
+            while (!feof($stream)) {
+                $body .= fgets($stream);
+            }
+            throw HTTPException::fromResponse($path, new Response($headers['status'], $headers, $body));
+        } else {
+            return $stream;
+        }
     }
 }
 

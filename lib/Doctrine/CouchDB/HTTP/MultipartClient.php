@@ -31,15 +31,48 @@ class MultipartClient extends AbstractHTTPClient
      */
     protected $targetConnection;
 
+    /**
+     * @return array
+     */
+    public function getSourceOptions()
+    {
+        return $this->sourceOptions;
+    }
+
+    /**
+     * @param array $sourceOptions
+     */
+    public function setSourceOptions($sourceOptions)
+    {
+        $this->sourceOptions = $sourceOptions;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTargetOptions()
+    {
+        return $this->targetOptions;
+    }
+
+    /**
+     * @param array $targetOptions
+     */
+    public function setTargetOptions($targetOptions)
+    {
+        $this->targetOptions = $targetOptions;
+    }
 
     /**
      * @param AbstractHTTPClient $source
      * @param AbstractHTTPClient $target
      */
-    public function __construct(AbstractHTTPClient $source, AbstractHTTPClient $target)
+    public function __construct(AbstractHTTPClient $source, AbstractHTTPClient $target = null)
     {
         $this->sourceOptions = $source->options;
-        $this->targetOptions = $target->options;
+        if ($target != null) {
+            $this->targetOptions = $target->options;
+        }
         $this->sourceConnection = null;
         $this->targetConnection = null;
 
@@ -129,8 +162,6 @@ class MultipartClient extends AbstractHTTPClient
             $host = $this->targetOptions['ip'];
         }
 
-        // $errno = '';
-        // $errstr = '';
         // If the connection could not be established, fsockopen sadly does not
         // only return false (as documented), but also always issues a warning.
         if ( ( $this->targetConnection === null ) &&
@@ -153,7 +184,7 @@ class MultipartClient extends AbstractHTTPClient
      * @param $connection
      * @return array
      */
-    protected function getStreamHeaders($connection)
+    public function getStreamHeaders($connection)
     {
         $headers = array();
         if($connection !== false) {
@@ -195,10 +226,17 @@ class MultipartClient extends AbstractHTTPClient
         $data = null,
         $raw = false,
         $sourceRequestHeaders = array(),
-        $targetPath = '/'
+        $targetPath = null
     ) {
         $this->checkSourceConnection($method, $sourcePath, $sourceRequestHeaders, $data);
         $sourceResponseHeaders = $this->getStreamHeaders($this->sourceConnection);
+
+        if ($targetPath == null) {
+            return $this->sourceConnection;
+        }
+        if ($this->targetOptions == null) {
+            throw new \InvalidArgumentException('Target is null.');
+        }
 
         //an array containing
         //1) array of json docs(string) that don't have attachements.
