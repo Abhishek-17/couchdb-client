@@ -654,7 +654,7 @@ class CouchDBClient
         $path = '/' . $this->databaseName . '/_changes';
         $multipartClient = new MultipartClient($this->getHttpClient());
 
-        $method = ((isset($params['doc_ids']) && $params['docs_ids']) == null ? "GET" : "POST");
+        $method = ((!isset($params['doc_ids']) || $params['docs_ids'] == null) ? "GET" : "POST");
         $stream = null;
 
         if ($method == "GET") {
