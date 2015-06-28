@@ -38,11 +38,11 @@ class BulkUpdater
 
     private $databaseName;
 
+
     public function __construct(Client $httpClient, $databaseName)
     {
         $this->httpClient = $httpClient;
         $this->databaseName = $databaseName;
-        $this->data["new_edits"] = false; 
     }
 
     public function setAllOrNothing($allOrNothing)
@@ -67,9 +67,16 @@ class BulkUpdater
         $this->data['docs'][] = array('_id' => $id, '_rev' => $rev, '_deleted' => true);
     }
 
+    public function setNewEdits($value)
+    {
+        if (is_bool($value)) {
+            $this->data["new_edits"] = $value;
+        }
+    }
+
     public function execute()
     {
-        return $this->httpClient->request('POST', $this->getPath(), json_encode($this->data, JSON_UNESCAPED_SLASHES), false, array('X-Couch-Full-Commit' => false));
+        return $this->httpClient->request('POST', $this->getPath(), json_encode($this->data), false, array('X-Couch-Full-Commit' => false));
     }
 
     public function getPath()
