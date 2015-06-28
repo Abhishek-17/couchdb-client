@@ -96,9 +96,10 @@ class SocketClient extends AbstractHTTPClient
      * @param string $method
      * @param string $path
      * @param string $data
+     * @param array $headers
      * @return string
      */
-    protected function buildRequest( $method, $path, $data, $headers )
+    protected function buildRequest( $method, $path, $data, $headers)
     {
         // Create basic request headers
         $request = "$method $path HTTP/1.1\r\nHost: {$this->options['host']}\r\n";
@@ -123,7 +124,7 @@ class SocketClient extends AbstractHTTPClient
             if (is_bool($value) === true) {
                 $value = ($value) ? 'true': 'false';
             }
-            $request .=$key.": ".$value."\r\n";
+            $request .= $key . ": ". $value . "\r\n";
         }
 
         // Also add headers and request body if data should be sent to the
@@ -154,9 +155,10 @@ class SocketClient extends AbstractHTTPClient
      * @param string $path
      * @param string $data
      * @param bool $raw
+     * @param array $headers
      * @return Response
      */
-    public function request( $method, $path, $data = null, $raw = false, $headers = array() )
+    public function request( $method, $path, $data = null, $raw = false, array $headers = array() )
     {
         // Try establishing the connection to the server
         $this->checkConnection();

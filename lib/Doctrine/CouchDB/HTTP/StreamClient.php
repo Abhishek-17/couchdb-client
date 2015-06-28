@@ -44,16 +44,19 @@ class StreamClient extends AbstractHTTPClient
      * @param string $path
      * @param string $data
      * @param bool $raw
+     * @param array $headers
      * @return Response
      * @throws HTTPException
      */
-    public function request( $method, $path, $data = null, $raw = false, $headers = null )
+    public function request( $method, $path, $data = null, $raw = false, array $headers = array())
     {
         $basicAuth = '';
         if ( $this->options['username'] ) {
             $basicAuth .= "{$this->options['username']}:{$this->options['password']}@";
         }
-
+        if (!isset($headers['Content-Type'])) {
+            $headers['Content-Type'] = 'application/json';
+        }
         $stringHeader = '';
         if ($headers != null) {
             foreach ($headers as $key => $val) {
