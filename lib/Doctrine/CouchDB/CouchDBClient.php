@@ -567,5 +567,4 @@ class CouchDBClient
 
         return $response->body;
     }
-
 }
