@@ -91,7 +91,7 @@ class SocketClient extends AbstractHTTPClient
     /**
      * Build a HTTP 1.1 request
      *
-     * Build the HTTP 1.1 request headers from the gicven input.
+     * Build the HTTP 1.1 request headers from the given input.
      *
      * @param string $method
      * @param string $path
@@ -149,7 +149,7 @@ class SocketClient extends AbstractHTTPClient
      * Perform a request to the server and return the result converted into a
      * Response object. If you do not expect a JSON structure, which
      * could be converted in such a response object, set the forth parameter to
-     * true, and you get a response object retuerned, containing the raw body.
+     * true, and you get a response object returned, containing the raw body.
      *
      * @param string $method
      * @param string $path
@@ -181,7 +181,7 @@ class SocketClient extends AbstractHTTPClient
             'connection' => ( $this->options['keep-alive'] ? 'Keep-Alive' : 'Close' ),
         );
 
-        // Remove leading newlines, should not accur at all, actually.
+        // Remove leading newlines, should not occur at all, actually.
         while ( ( ( $line = fgets( $this->connection ) ) !== false ) &&
                 ( ( $lineContent = rtrim( $line ) ) === '' ) );
 
@@ -283,7 +283,7 @@ class SocketClient extends AbstractHTTPClient
                 return $this->request( $method, $path, $data, $raw );
         }
 
-        // Create repsonse object from couch db response
+        // Create response object from couch db response
         if ( $headers['status'] >= 400 )
         {
             return new ErrorResponse( $headers['status'], $headers, $body );

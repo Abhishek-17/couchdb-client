@@ -38,7 +38,7 @@ class StreamClient extends AbstractHTTPClient
      * Perform a request to the server and return the result converted into a
      * Response object. If you do not expect a JSON structure, which
      * could be converted in such a response object, set the forth parameter to
-     * true, and you get a response object retuerned, containing the raw body.
+     * true, and you get a response object returned, containing the raw body.
      *
      * @param string $method
      * @param string $path
@@ -128,7 +128,7 @@ class StreamClient extends AbstractHTTPClient
             );
         }
 
-        // Create repsonse object from couch db response
+        // Create response object from couch db response
         if ( $headers['status'] >= 400 )
         {
             return new ErrorResponse( $headers['status'], $headers, $body );
