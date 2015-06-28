@@ -155,9 +155,10 @@ class SocketClient extends AbstractHTTPClient
      * @param string $path
      * @param string $data
      * @param bool $raw
+     * @param array $headers
      * @return Response
      */
-    public function request( $method, $path, $data = null, $raw = false, $headers = array() )
+    public function request( $method, $path, $data = null, $raw = false, array $headers = array() )
     {
         // Try establishing the connection to the server
         $this->checkConnection();
