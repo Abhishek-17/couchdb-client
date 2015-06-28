@@ -46,8 +46,10 @@ class MultipartClient extends AbstractHTTPClient
     }
 
     /**
-     * @param $sourceHeaders
+     * @param $method
      * @param $sourcePath
+     * @param $sourceHeaders
+     * @param $data
      * @throws HTTPException
      */
     protected function checkSourceConnection($method, $sourcePath, $sourceHeaders, & $data)
@@ -57,8 +59,8 @@ class MultipartClient extends AbstractHTTPClient
         if ( $this->sourceOptions['username'] ) {
             $basicAuth .= "{$this->sourceOptions['username']}:{$this->sourceOptions['password']}@";
         }
-        if (!isset($headers['Content-Type'])) {
-            $headers['Content-Type'] = 'application/json';
+        if (!isset($sourceHeaders['Content-Type'])) {
+            $sourceHeaders['Content-Type'] = 'application/json';
         }
         $header = '';
         if ($sourceHeaders != null) {
