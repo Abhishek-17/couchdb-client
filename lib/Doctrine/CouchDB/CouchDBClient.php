@@ -294,7 +294,7 @@ class CouchDBClient
     {
         $path = '/' . $this->databaseName . '/_changes';
 
-        $method = (isset($params['doc_ids']) ? "GET" : "POST");
+        $method = ((!isset($params['doc_ids']) || $params['docs_ids'] == null) ? "GET" : "POST");
         $response = '';
 
         if ($method == "GET") {
